@@ -29,6 +29,16 @@ impl Extent2D {
     pub const fn is_empty(self) -> bool {
         self.width == 0 || self.height == 0
     }
+
+    /// Returns `true` if `other` fits inside this extent.
+    pub const fn contains(self, other: Extent2D) -> bool {
+        self.width >= other.width && self.height >= other.height
+    }
+
+    /// Returns the width-to-height ratio.
+    pub fn aspect_ratio(self) -> f64 {
+        self.width as f64 / self.height as f64
+    }
 }
 
 impl fmt::Display for Extent2D {

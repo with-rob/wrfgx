@@ -1,23 +1,23 @@
 use crate::error::GpuError;
 use crate::extent::Extent2D;
 use crate::limits::LIMITS;
+use crate::present_mode::PresentMode;
+use crate::surface_format::SurfaceFormat;
 
 /// Swapchain creation parameters.
 ///
-/// Backend-defined numeric codes: each backend maps `format` and
-/// `present_mode` to its native values (`VkFormat` /
-/// `VkPresentModeKHR` on Vulkan, internal format / swap interval
-/// on OpenGL). `0` means "backend default".
+/// `format` and `present_mode` are concrete enums shared by every
+/// backend, so the same config works on Vulkan, OpenGL and WebGPU.
 ///
 /// # Examples
 ///
 /// ```rust
-/// use wrfgx::{Extent2D, SwapchainConfig};
+/// use wrfgx::{Extent2D, PresentMode, SurfaceFormat, SwapchainConfig};
 ///
 /// let config = SwapchainConfig {
 ///     extent: Extent2D::new(800, 600),
-///     format: 0,
-///     present_mode: 0,
+///     format: SurfaceFormat::B8G8R8A8Srgb,
+///     present_mode: PresentMode::Fifo,
 ///     image_count: 3,
 /// };
 /// assert_eq!(config.image_count, 3);
@@ -26,10 +26,10 @@ use crate::limits::LIMITS;
 pub struct SwapchainConfig {
     /// Swapchain size in physical pixels.
     pub extent: Extent2D,
-    /// Backend-defined image format code.
-    pub format: u32,
-    /// Backend-defined present mode code.
-    pub present_mode: u32,
+    /// Image format shared by every backend.
+    pub format: SurfaceFormat,
+    /// Present mode shared by every backend.
+    pub present_mode: PresentMode,
     /// Number of swapchain images.
     pub image_count: u32,
 }
@@ -44,19 +44,29 @@ impl SwapchainConfig {
     /// # Examples
     ///
     /// ```rust
-    /// use wrfgx::{Extent2D, GpuError, SwapchainConfig};
+    /// use wrfgx::{Extent2D, GpuError, PresentMode, SurfaceFormat, SwapchainConfig};
     ///
-    /// let config = SwapchainConfig::new(Extent2D::new(800, 600), 0, 0, 1)?;
+    /// let config = SwapchainConfig::new(
+    ///     Extent2D::new(800, 600),
+    ///     SurfaceFormat::B8G8R8A8Srgb,
+    ///     PresentMode::Fifo,
+    ///     1,
+    /// )?;
     /// assert_eq!(config.image_count, 2);
     ///
-    /// let empty = SwapchainConfig::new(Extent2D::new(0, 0), 0, 0, 3);
+    /// let empty = SwapchainConfig::new(
+    ///     Extent2D::new(0, 0),
+    ///     SurfaceFormat::B8G8R8A8Srgb,
+    ///     PresentMode::Fifo,
+    ///     3,
+    /// );
     /// assert_eq!(empty, Err(GpuError::SurfaceLost));
     /// # Ok::<(), GpuError>(())
     /// ```
     pub fn new(
         extent: Extent2D,
-        format: u32,
-        present_mode: u32,
+        format: SurfaceFormat,
+        present_mode: PresentMode,
         image_count: u32,
     ) -> Result<Self, GpuError> {
         if extent.is_empty() {
@@ -73,5 +83,10 @@ impl SwapchainConfig {
             present_mode,
             image_count,
         })
+    }
+
+    /// Returns a copy with a different extent, re-validated.
+    pub fn with_extent(self, extent: Extent2D) -> Result<Self, GpuError> {
+        Self::new(extent, self.format, self.present_mode, self.image_count)
     }
 }
