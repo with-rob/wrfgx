@@ -5,7 +5,7 @@ edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/with-rob/wrfgx"
 rust-version = "1.96"
-description = "Low-level GPU primitives shared by every backend (Vulkan, OpenGL, WebGPU)."
+description = "Zero-dependency GPU surface contract: formats, present modes and swapchain config."
 
 [lib]
 crate-type = ["rlib"]
