@@ -1,5 +1,6 @@
 use std::fmt;
 
+use crate::bind_group::BindGroupLayout;
 use crate::shader::ShaderModule;
 use crate::texture::TextureFormat;
 use crate::vertex::VertexBufferLayout;
@@ -232,6 +233,7 @@ pub struct StencilState {
 ///     vertex_shader: ShaderModule::from_raw(1),
 ///     fragment_shader: Some(ShaderModule::from_raw(2)),
 ///     vertex_buffers: vec![],
+///     bind_group_layouts: vec![],
 ///     color_formats: vec![wrfgx::TextureFormat::Rgba8Unorm],
 ///     depth_format: None,
 ///     topology: PrimitiveTopology::TriangleList,
@@ -252,6 +254,8 @@ pub struct PipelineDescriptor {
     pub fragment_shader: Option<ShaderModule>,
     /// Vertex buffer layouts.
     pub vertex_buffers: Vec<VertexBufferLayout>,
+    /// Bind group layouts, in set-index order.
+    pub bind_group_layouts: Vec<BindGroupLayout>,
     /// Color attachment formats.
     pub color_formats: Vec<TextureFormat>,
     /// Depth/stencil format (`None` = no depth).
