@@ -24,6 +24,11 @@ impl Extent2D {
     pub const fn new(width: u32, height: u32) -> Self {
         Self { width, height }
     }
+
+    /// Returns `true` if either dimension is zero (no drawable area).
+    pub const fn is_empty(self) -> bool {
+        self.width == 0 || self.height == 0
+    }
 }
 
 impl fmt::Display for Extent2D {
