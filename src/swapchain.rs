@@ -1,26 +1,32 @@
+use crate::alpha_mode::AlphaMode;
 use crate::error::GpuError;
 use crate::extent::Extent2D;
 use crate::limits::LIMITS;
 use crate::present_mode::PresentMode;
 use crate::surface_format::SurfaceFormat;
+use crate::texture::TextureUsage;
 
 /// Swapchain creation parameters.
 ///
 /// `format` and `present_mode` are concrete enums shared by every
-/// backend, so the same config works on Vulkan, OpenGL and WebGPU.
+/// backend, so the same config works on Vulkan, OpenGL, WebGPU,
+/// Metal, DirectX and WebGL2.
 ///
 /// # Examples
 ///
 /// ```rust
-/// use wrfgx::{Extent2D, PresentMode, SurfaceFormat, SwapchainConfig};
+/// use wrfgx::{AlphaMode, Extent2D, PresentMode, SurfaceFormat, SwapchainConfig, TextureUsage};
 ///
-/// let config = SwapchainConfig {
-///     extent: Extent2D::new(800, 600),
-///     format: SurfaceFormat::B8G8R8A8Srgb,
-///     present_mode: PresentMode::Fifo,
-///     image_count: 3,
-/// };
+/// let config = SwapchainConfig::new(
+///     Extent2D::new(800, 600),
+///     SurfaceFormat::B8G8R8A8Srgb,
+///     PresentMode::Fifo,
+///     3,
+/// )
+/// .unwrap();
 /// assert_eq!(config.image_count, 3);
+/// assert_eq!(config.usage, TextureUsage::RENDER);
+/// assert_eq!(config.alpha_mode, AlphaMode::Opaque);
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct SwapchainConfig {
@@ -32,6 +38,10 @@ pub struct SwapchainConfig {
     pub present_mode: PresentMode,
     /// Number of swapchain images.
     pub image_count: u32,
+    /// How swapchain images are used.
+    pub usage: TextureUsage,
+    /// Window compositing mode.
+    pub alpha_mode: AlphaMode,
 }
 
 impl SwapchainConfig {
@@ -39,7 +49,11 @@ impl SwapchainConfig {
     ///
     /// Rejects an empty extent (`SurfaceLost`): every backend needs
     /// a real size. Clamps `image_count` into [`LIMITS`] — the same
-    /// bounds on Vulkan, OpenGL and WebGPU, so backends never ask.
+    /// bounds everywhere, so backends never ask.
+    ///
+    /// `usage` defaults to `RENDER`, `alpha_mode` to `Opaque`;
+    /// change them with [`with_usage`](Self::with_usage) and
+    /// [`with_alpha_mode`](Self::with_alpha_mode).
     ///
     /// # Examples
     ///
@@ -82,11 +96,25 @@ impl SwapchainConfig {
             format,
             present_mode,
             image_count,
+            usage: TextureUsage::RENDER,
+            alpha_mode: AlphaMode::Opaque,
         })
     }
 
     /// Returns a copy with a different extent, re-validated.
     pub fn with_extent(self, extent: Extent2D) -> Result<Self, GpuError> {
         Self::new(extent, self.format, self.present_mode, self.image_count)
+    }
+
+    /// Returns a copy with different image usage.
+    pub fn with_usage(mut self, usage: TextureUsage) -> Self {
+        self.usage = usage;
+        self
+    }
+
+    /// Returns a copy with a different compositing mode.
+    pub fn with_alpha_mode(mut self, alpha_mode: AlphaMode) -> Self {
+        self.alpha_mode = alpha_mode;
+        self
     }
 }

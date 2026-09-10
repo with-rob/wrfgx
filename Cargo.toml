@@ -16,3 +16,7 @@ missing_docs = "warn"
 
 [lints.clippy]
 must_use_candidate = "allow"
+
+[features]
+default = ["compute"]
+compute = []

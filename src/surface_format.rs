@@ -1,17 +1,23 @@
 use std::fmt;
 
+use crate::texture::TextureFormat;
+
 /// Image format for a swapchain surface.
 ///
-/// Only formats available on every backend (Vulkan, OpenGL,
-/// WebGPU). Anything exotic stays out.
+/// Only formats available on every backend. Anything exotic stays
+/// out.
 ///
 /// # Examples
 ///
 /// ```rust
-/// use wrfgx::SurfaceFormat;
+/// use wrfgx::{SurfaceFormat, TextureFormat};
 ///
 /// let format = SurfaceFormat::B8G8R8A8Srgb;
 /// assert_eq!(format.bytes_per_pixel(), 4);
+/// assert_eq!(
+///     format.to_texture_format(),
+///     TextureFormat::B8G8R8A8Srgb
+/// );
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SurfaceFormat {
@@ -29,6 +35,16 @@ impl SurfaceFormat {
     /// Bytes per pixel for this format.
     pub const fn bytes_per_pixel(self) -> u32 {
         4
+    }
+
+    /// The equivalent [`TextureFormat`].
+    pub const fn to_texture_format(self) -> TextureFormat {
+        match self {
+            Self::B8G8R8A8Srgb => TextureFormat::B8G8R8A8Srgb,
+            Self::B8G8R8A8Unorm => TextureFormat::B8G8R8A8Unorm,
+            Self::R8G8B8A8Srgb => TextureFormat::Rgba8UnormSrgb,
+            Self::R8G8B8A8Unorm => TextureFormat::Rgba8Unorm,
+        }
     }
 }
 
