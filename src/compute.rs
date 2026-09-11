@@ -66,3 +66,38 @@ pub struct DispatchCommand {
     /// Workgroups on Z.
     pub groups_z: u32,
 }
+
+/// One compute command, run outside any render pass.
+///
+/// Backends translate each variant to their native call
+/// (`vkCmdDispatch`, encoder methods, ...).
+///
+/// # Examples
+///
+/// ```rust
+/// use wrfgx::{ComputeCommands, ComputePipeline, DispatchCommand};
+///
+/// let commands = [
+///     ComputeCommands::SetPipeline(ComputePipeline::from_raw(1)),
+///     ComputeCommands::Dispatch(DispatchCommand {
+///         groups_x: 8,
+///         groups_y: 1,
+///         groups_z: 1,
+///     }),
+/// ];
+/// assert_eq!(commands.len(), 2);
+/// ```
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ComputeCommands {
+    /// Bind a compute pipeline.
+    SetPipeline(ComputePipeline),
+    /// Bind a bind group to an index.
+    SetBindGroup {
+        /// Group index.
+        index: u32,
+        /// Bound group.
+        group: crate::bind_group::BindGroup,
+    },
+    /// Run the bound pipeline over the workgroup grid.
+    Dispatch(DispatchCommand),
+}

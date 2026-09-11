@@ -57,7 +57,7 @@ pub use commands::{
     DrawCommand, DrawIndexedCommand, IndexFormat, RenderCommands, Scissor, Viewport,
 };
 #[cfg(feature = "compute")]
-pub use compute::{ComputePipeline, ComputePipelineDescriptor, DispatchCommand};
+pub use compute::{ComputeCommands, ComputePipeline, ComputePipelineDescriptor, DispatchCommand};
 pub use error::GpuError;
 pub use extent::Extent2D;
 pub use limits::{LIMITS, Limits};
