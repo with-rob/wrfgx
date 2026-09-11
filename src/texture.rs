@@ -62,8 +62,10 @@ impl TextureFormat {
             | Self::Rgb10A2Unorm
             | Self::B8G8R8A8Unorm
             | Self::B8G8R8A8Srgb => 4,
-            Self::Rgba16Float | Self::D16Unorm => 8,
-            Self::Rgba32Float | Self::D32Float | Self::D24UnormS8Uint => 16,
+            Self::Rgba16Float => 8,
+            Self::Rgba32Float => 16,
+            Self::D16Unorm => 2,
+            Self::D32Float | Self::D24UnormS8Uint => 4,
             Self::R8Unorm => 1,
             Self::R16Float => 2,
             Self::R32Float => 4,
@@ -223,5 +225,21 @@ impl TextureView {
     /// The backend view id.
     pub const fn raw(self) -> u64 {
         self.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bytes_per_pixel_matches_spec() {
+        assert_eq!(TextureFormat::Rgba8Unorm.bytes_per_pixel(), 4);
+        assert_eq!(TextureFormat::Rgba16Float.bytes_per_pixel(), 8);
+        assert_eq!(TextureFormat::Rgba32Float.bytes_per_pixel(), 16);
+        assert_eq!(TextureFormat::D16Unorm.bytes_per_pixel(), 2);
+        assert_eq!(TextureFormat::D32Float.bytes_per_pixel(), 4);
+        assert_eq!(TextureFormat::D24UnormS8Uint.bytes_per_pixel(), 4);
+        assert_eq!(TextureFormat::R8Unorm.bytes_per_pixel(), 1);
     }
 }
